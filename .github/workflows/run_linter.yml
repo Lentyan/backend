@@ -1,9 +1,9 @@
-name: Linter and tests
+name: Run linter
 
 on:
   push:
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "develop", "main" ]
 
 permissions:
   contents: read
