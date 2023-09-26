@@ -6,9 +6,19 @@ services:
     container_name: postgres_database
     image: postgres:14.7-alpine
     env_file:
-      - ./.env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - .env
+
+  backend:
+    build:
+      context: ..
+      dockerfile: ./infra/Dockerfile
+    container_name: django_backend
+    depends_on:
+      - db
+    restart: always
+    env_file:
+      - .env
+
 
 volumes:
   postgres_data:

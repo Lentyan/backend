@@ -11,6 +11,7 @@ python-dotenv = "^1.0.0"
 django = "^4.2.5"
 python-environ = "^0.4.54"
 djangorestframework = "^3.14.0"
+gunicorn = "^21.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
