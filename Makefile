@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-LOCAL_COMPOSE_FILE := infra/docker-compose.local.yaml
+LOCAL_COMPOSE_FILE := infra/dev/docker-compose.local.yaml
 
 COLOR_RESET = \033[0m
 COLOR_GREEN = \033[32m
