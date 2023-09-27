@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from src.forecasts.models import SKU
+from forecasts.models import SKU
 
 
 class SKUModelTestCase(TestCase):

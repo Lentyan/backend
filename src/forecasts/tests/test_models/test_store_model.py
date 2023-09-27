@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from src.forecasts.models import Store
+from forecasts.models import Store
 
 
 class StoreModelTestCase(TestCase):
