@@ -3,6 +3,7 @@
 #### Проект backend-сервиса системы для управления поступающими запросами и обеспечивания взаимодействия между другими компонентами.
 
 [![Run linter](https://github.com/Lentyan/backend/actions/workflows/run_linter.yml/badge.svg)](https://github.com/Lentyan/backend/actions/workflows/run_linter.yml)
+[![Tests](https://github.com/Lentyan/backend/actions/workflows/run_tests.yml/badge.svg)](https://github.com/Lentyan/backend/actions/workflows/run_tests.yml)
 
 # Содержание
 
