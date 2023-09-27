@@ -35,11 +35,11 @@ class Store(models.Model):
     )
     type_format = models.IntegerField(
         verbose_name="Формат магазина",
-        choices=TypeFormatChoices,
+        choices=TypeFormatChoices.choices,
     )
     loc = models.IntegerField(
         verbose_name="Локация/окружение магазина",
-        choices=LocChoices,
+        choices=LocChoices.choices,
     )
     size = models.IntegerField(
         verbose_name="Размер магазина",
@@ -121,7 +121,7 @@ class SKU(models.Model):
     )
     uom = models.IntegerField(
         verbose_name="Единицы измерения",
-        choices=UOMChoices,
+        choices=UOMChoices.choices,
     )
 
     class Meta:
