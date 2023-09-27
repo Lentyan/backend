@@ -207,8 +207,12 @@ class Forecast(models.Model):
         verbose_name="Товар",
     )
 
-    forecast_date = models.DateTimeField()
-    forecast = models.JSONField()
+    forecast_date = models.DateTimeField(
+        verbose_name="Дата прогноза",
+    )
+    forecast = models.JSONField(
+        verbose_name="Прогноз",
+    )
 
     def __str__(self):
         """Return forecast data as str."""
