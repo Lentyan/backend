@@ -3,7 +3,7 @@ from datetime import datetime
 import pytz
 from django.test import TestCase
 
-from forecasts.models import SKU, Forecast, Store
+from src.forecasts.models import SKU, Forecast, Store
 
 
 class ForecastModelTestCase(TestCase):
