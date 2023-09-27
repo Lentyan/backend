@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import pytz
 from django.test import TestCase
 
 from forecasts.models import SKU, Sale, Store
@@ -8,6 +11,8 @@ class SaleModelTestCase(TestCase):
 
     def setUp(self):
         """Create sample Store, SKU, and Sale instances for testing."""
+        timezone = pytz.timezone("UTC")
+
         self.store = Store.objects.create(
             store="Store1",
             city="City1",
@@ -27,7 +32,9 @@ class SaleModelTestCase(TestCase):
         self.sale = Sale.objects.create(
             store=self.store,
             sku=self.sku,
-            date="2023-09-26T12:00:00",
+            date=timezone.localize(
+                datetime.strptime("2023-09-26T12:00:00", "%Y-%m-%dT%H:%M:%S")
+            ),
             sales_type=True,
             sales_units=50,
             sales_units_promo=25,
@@ -46,9 +53,7 @@ class SaleModelTestCase(TestCase):
 
         self.assertEqual(sale_from_db.store, self.store)
         self.assertEqual(sale_from_db.sku, self.sku)
-        self.assertEqual(
-            sale_from_db.date.strftime("%Y-%m-%dT%H:%M:%S"), self.sale.date
-        )
+        self.assertEqual(sale_from_db.date, self.sale.date)
         self.assertEqual(sale_from_db.sales_type, True)
         self.assertEqual(sale_from_db.sales_units, 50)
         self.assertEqual(sale_from_db.sales_units_promo, 25)
