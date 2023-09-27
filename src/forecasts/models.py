@@ -6,6 +6,21 @@ from django.utils.translation import gettext_lazy as _
 class Store(models.Model):
     """Model representing stores information."""
 
+    class LocChoices(models.Choices):
+        """Store loc field choices."""
+
+        FIRST = 1
+        SECOND = 2
+        THIRD = 3
+
+    class TypeFormatChoices(models.Choices):
+        """Store type format choices."""
+
+        FIRST = 1
+        SECOND = 2
+        THIRD = 3
+        FOURTH = 4
+
     store = models.CharField(
         max_length=255,
         verbose_name="Магазин",
@@ -20,9 +35,11 @@ class Store(models.Model):
     )
     type_format = models.IntegerField(
         verbose_name="Формат магазина",
+        choices=TypeFormatChoices,
     )
     loc = models.IntegerField(
         verbose_name="Локация/окружение магазина",
+        choices=LocChoices,
     )
     size = models.IntegerField(
         verbose_name="Размер магазина",
