@@ -1,3 +1,4 @@
+import pytz
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -28,6 +29,13 @@ class Store(models.Model):
     )
     is_active = models.BooleanField(verbose_name="Активен")
 
+    timezone = models.CharField(
+        max_length=63,
+        verbose_name="Часовой пояс",
+        choices=[(tz, tz) for tz in pytz.all_timezones],
+        default="UTC",
+    )
+
     class Meta:
         """Store model metadata."""
 
@@ -40,14 +48,14 @@ class Store(models.Model):
         ordering = ("id",)
         constraints = [
             models.UniqueConstraint(
-                fields=[
+                fields=(
                     "store",
                     "city",
                     "division",
                     "type_format",
                     "loc",
                     "size",
-                ],
+                ),
                 name="unique_stores",
             )
         ]
@@ -104,14 +112,14 @@ class SKU(models.Model):
         ordering = ("id",)
         constraints = [
             models.UniqueConstraint(
-                fields=[
+                fields=(
                     "group",
                     "category",
                     "subcategory",
                     "sku",
                     "uom",
-                ],
-                name="unique_product",
+                ),
+                name="unique_SKUs",
             )
         ]
         indexes = [
@@ -180,6 +188,17 @@ class Sale(models.Model):
         )
         ordering = ("id",)
 
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "store",
+                    "sku",
+                    "date",
+                ),
+                name="unique_sales",
+            )
+        ]
+
         indexes = [
             models.Index(
                 fields=(
@@ -231,6 +250,16 @@ class Forecast(models.Model):
         )
         ordering = ("id",)
 
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "store",
+                    "sku",
+                    "forecast_date",
+                ),
+                name="unique_forecasts",
+            )
+        ]
         indexes = [
             models.Index(
                 fields=(
