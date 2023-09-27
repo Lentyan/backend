@@ -97,6 +97,12 @@ class Store(models.Model):
 class SKU(models.Model):
     """Model representing SKUs information."""
 
+    class UOMChoices(models.Choices):
+        """SKU uom field choices."""
+
+        BY_WEIGHT = 17
+        BY_PIECE = 1
+
     group = models.CharField(
         max_length=255,
         verbose_name="Группа",
@@ -115,6 +121,7 @@ class SKU(models.Model):
     )
     uom = models.IntegerField(
         verbose_name="Единицы измерения",
+        choices=UOMChoices,
     )
 
     class Meta:
