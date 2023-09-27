@@ -18,7 +18,8 @@ jobs:
           python-version: 3.x
 
       - name: Install dependencies
-        run: pip install -r src/requirements/develop.txt
+        working-directory: ./src
+        run: pip install -r ./requirements/develop.txt
 
       - name: Run Django tests
         working-directory: ./src
