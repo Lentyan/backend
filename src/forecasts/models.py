@@ -250,6 +250,16 @@ class Forecast(models.Model):
         )
         ordering = ("id",)
 
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "store",
+                    "sku",
+                    "forecast_date",
+                ),
+                name="unique_forecasts",
+            )
+        ]
         indexes = [
             models.Index(
                 fields=(
