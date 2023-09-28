@@ -1,4 +1,5 @@
 import csv
+from itertools import islice
 
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
@@ -8,6 +9,8 @@ from forecasts.models import SKU, Sale, Store
 
 class Command(BaseCommand):
     """Management command to fill the database with data from CSV files."""
+
+    BATCH_SIZE = 1000
 
     PROGRESS_BAR_CONFIG = {"ncols": 100, "colour": "green"}
 
@@ -64,17 +67,29 @@ class Command(BaseCommand):
         for model, data in self.model_file_mapping.items():
             self.import_data(model, **data)
 
+    def read_csv_file(self, file_path, batch_size=None):
+        """Open a CSV file."""
+        if batch_size is None:
+            batch_size = self.BATCH_SIZE
+        with open(file_path, "r") as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            while True:
+                batch = list(islice(csv_reader, batch_size))
+                if not batch:
+                    return
+
+                yield batch
+
     def import_data(self, model, path, mapping):
         """Open a CSV file and populate the database with related models."""
         try:
-            with open(path, "r") as csv_file:
-                csv_reader = csv.DictReader(csv_file)
+            for batch in tqdm(
+                self.read_csv_file(path),
+                desc=f"Filling {model.__name__} table...",
+                **self.PROGRESS_BAR_CONFIG,
+            ):
                 objects = []
-                for row in tqdm(
-                    csv_reader,
-                    desc=f"Filling {model.__name__} table...",
-                    **self.PROGRESS_BAR_CONFIG,
-                ):
+                for row in batch:
                     object_data = {}
                     for field, data in mapping.items():
                         if referenced_model := data.get("reference", None):
@@ -91,7 +106,7 @@ class Command(BaseCommand):
                         else:
                             object_data[field] = row[data["csv_name"]]
                     objects.append(model(**object_data))
-                model.objects.bulk_create(objects)
+            model.objects.bulk_create(objects, batch_size=self.BATCH_SIZE)
             self.stdout.write(
                 self.style.SUCCESS(
                     f"{model.__name__} data successfully imported!",
