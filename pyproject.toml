@@ -15,6 +15,7 @@ gunicorn = "^21.2.0"
 psycopg2-binary = "^2.9.7"
 tqdm = "^4.66.1"
 django-filter = "^23.3"
+drf-yasg = "^1.21.7"
 
 
 [tool.poetry.group.dev.dependencies]
