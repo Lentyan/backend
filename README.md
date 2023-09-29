@@ -26,7 +26,8 @@
    3.1. [Запуск сервиса для локальной разработки](#run-local)
 
 # 1. [БРИФ](docs/brif.md) <a id="brif"></a>
-   ## 1.1. [ER - диаграмма сущностей](docs/db_er_blueprint.pdf)<a id="db_er_blueprint"></a>
+
+## 1.1. [ER - диаграмма сущностей](docs/db_er_blueprint.pdf)<a id="db_er_blueprint"></a>
 
 # 2. Подготовка к запуску <a id="start"></a>
 
@@ -227,3 +228,18 @@ poetry update
 make run-local
 ```
 
+# 4. Документация API
+
+Для документации API используется drf-yasg. Вы можете использовать Swagger
+UI для визуализации и взаимодействия с вашим API.
+
+На данный момент доступны следующие версии API:
+
+* [API v1](#api_v1)
+
+## 4.1 Версия API: v1 <a id="api_v1"></a>
+
+Подробная документация доступна:
+
+* Swagger: ```/api/v1/swagger/```
+* Redoc: ```/api/v1/redoc/```
