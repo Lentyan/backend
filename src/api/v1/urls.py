@@ -19,9 +19,11 @@ v1_router.register(r"categories", views.SKUViewSet, basename="categories")
 v1_router.register(r"shops", views.StoreViewSet, basename="shops")
 v1_router.register(r"sales", views.SaleViewSet, basename="sales")
 v1_router.register(r"forecasts", views.ForecastViewSet, basename="forecasts")
+v1_router.register(r"user", views.UserViewSet, basename="user")
 
 urlpatterns = [
     path("", include(v1_router.urls)),
+    path("auth/", include("djoser.urls.jwt")),
     path(
         "swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
