@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_yasg",
     "django_filters",
     "forecasts.apps.ForecastsConfig",
     "api.v1.apps.V1Config",
@@ -118,4 +119,14 @@ REST_FRAMEWORK = {
     "VERSION_PARAM": "version",
     "DEFAULT_PAGINATION_CLASS": "api.v1.pagination.PageNumberPaginationWithLimit",  # noqa
     "PAGE_SIZE": 5,
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+}
+
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
+    "SECURITY_DEFINITIONS": {
+        "basic": {
+            "type": "basic",
+        },
+    },
 }
