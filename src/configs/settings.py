@@ -26,8 +26,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "Default key")
 
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -42,6 +40,7 @@ INSTALLED_APPS = [
     "django_filters",
     "forecasts.apps.ForecastsConfig",
     "api.v1.apps.V1Config",
+    "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
@@ -80,6 +79,8 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+AUTH_USER_MODEL = "users.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
