@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from forecasts.models import SKU, Forecast, Sale, Store
+from users.models import User
 
 
 class SKUSerializer(serializers.ModelSerializer):
@@ -55,7 +56,7 @@ class SaleSerializer(serializers.ModelSerializer):
 
 
 class ForecastSerializer(serializers.ModelSerializer):
-    """Forecast list serializer."""
+    """Forecast model serializer."""
 
     store = serializers.SlugRelatedField(
         slug_field="store",
@@ -67,7 +68,7 @@ class ForecastSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        """Forecast list serializer meta."""
+        """Forecast model serializer meta."""
 
         model = Forecast
         fields = (
@@ -76,3 +77,13 @@ class ForecastSerializer(serializers.ModelSerializer):
             "forecast_date",
             "forecast",
         )
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """User model serializer."""
+
+    class Meta:
+        """User model serializer meta."""
+
+        model = User
+        fields = ("email", "first_name", "last_name")

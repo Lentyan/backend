@@ -212,17 +212,6 @@ class Sale(models.Model):
         )
         ordering = ("id",)
 
-        constraints = [
-            models.UniqueConstraint(
-                fields=(
-                    "store",
-                    "sku",
-                    "date",
-                ),
-                name="unique_sales",
-            )
-        ]
-
         indexes = [
             models.Index(
                 fields=(
