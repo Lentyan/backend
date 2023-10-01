@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.8"
 
 services:
 
@@ -20,7 +20,6 @@ services:
     build:
       context: ..
       dockerfile: ./infra/Dockerfile
-    entrypoint: ./infra/backend-entrypoint.sh
     volumes:
       - ../static:/app/src/static
     depends_on:
