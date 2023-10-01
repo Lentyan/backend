@@ -24,6 +24,9 @@
 3. [Запуск сервиса](#run-service)
 
    3.1. [Запуск сервиса для локальной разработки](#run-local)
+4. [Документация API](#api-docs)
+
+   4.1 [Версия API v1](#api_v1)
 
 # 1. [БРИФ](docs/brif.md) <a id="brif"></a>
 
@@ -235,7 +238,7 @@ git clone https://github.com/Lentyan/backend.git
 make run-local
 ```
 
-# 4. Документация API
+# 4. Документация API <a id="api-docs"></a>
 
 Для документации API используется drf-yasg. Вы можете использовать Swagger
 UI для визуализации и взаимодействия с вашим API.
