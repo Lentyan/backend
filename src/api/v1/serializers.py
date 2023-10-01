@@ -12,12 +12,31 @@ class SKUSerializer(serializers.ModelSerializer):
 
         model = SKU
         fields = (
+            "id",
             "sku",
             "group",
             "category",
             "subcategory",
             "uom",
         )
+
+
+class GroupSerializer(serializers.Serializer):
+    """SKU groups list serializer."""
+
+    groups = serializers.ListSerializer(child=serializers.CharField())
+
+
+class CategorySerializer(serializers.Serializer):
+    """SKU categories list serializer."""
+
+    categories = serializers.ListSerializer(child=serializers.CharField())
+
+
+class SubcategorySerializer(serializers.Serializer):
+    """SKU subcategories list serializer."""
+
+    subcategories = serializers.ListSerializer(child=serializers.CharField())
 
 
 class StoreSerializer(serializers.ModelSerializer):
@@ -28,6 +47,7 @@ class StoreSerializer(serializers.ModelSerializer):
 
         model = Store
         fields = (
+            "id",
             "store",
             "city",
             "division",
