@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -76,10 +77,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "configs.wsgi.application"
 
 DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.sqlite3",
-    #     "NAME": BASE_DIR / "db.sqlite3",
-    # }
+    "test": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    },
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "HOST": env.str("POSTGRES_HOST"),
@@ -89,6 +90,9 @@ DATABASES = {
         "PASSWORD": env.str("POSTGRES_PASSWORD"),
     },
 }
+
+if "test" in sys.argv:
+    DATABASES["default"] = DATABASES["test"]
 
 AUTH_USER_MODEL = "users.User"
 
@@ -117,7 +121,7 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = str(BASE_DIR / "static")
