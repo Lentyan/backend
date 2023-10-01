@@ -145,6 +145,7 @@ class UserViewSet(viewsets.GenericViewSet):
 
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
+    pagination_class = None
 
     @action(methods=("get",), detail=False)
     def me(self, request, *args, **kwargs):
