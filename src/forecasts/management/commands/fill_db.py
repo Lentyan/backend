@@ -94,9 +94,9 @@ class Command(BaseCommand):
                     for field, data in mapping.items():
                         if referenced_model := data.get("reference", None):
                             referenced_model_instance = (
-                                referenced_model.objects.filter(
+                                referenced_model.objects.get(
                                     **{field: row[data["csv_name"]]},
-                                ).first()
+                                )
                             )
                             object_data[field] = referenced_model_instance
                         elif field_type := data.get("type", None):
@@ -106,7 +106,7 @@ class Command(BaseCommand):
                         else:
                             object_data[field] = row[data["csv_name"]]
                     objects.append(model(**object_data))
-            model.objects.bulk_create(objects, batch_size=self.BATCH_SIZE)
+                model.objects.bulk_create(objects, batch_size=self.BATCH_SIZE)
             self.stdout.write(
                 self.style.SUCCESS(
                     f"{model.__name__} data successfully imported!",
