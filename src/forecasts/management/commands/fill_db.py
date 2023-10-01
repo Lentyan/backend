@@ -17,7 +17,7 @@ class Command(BaseCommand):
     help = "Fill database with data."
     model_file_mapping = {
         Store: {
-            "path": "data/st_df.csv",
+            "path": "../data/st_df.csv",
             "mapping": {
                 "store": {"csv_name": "st_id"},
                 "city": {"csv_name": "st_city_id"},
@@ -29,7 +29,7 @@ class Command(BaseCommand):
             },
         },
         SKU: {
-            "path": "data/pr_df.csv",
+            "path": "../data/pr_df.csv",
             "mapping": {
                 "group": {"csv_name": "pr_group_id"},
                 "category": {"csv_name": "pr_cat_id"},
@@ -39,7 +39,7 @@ class Command(BaseCommand):
             },
         },
         Sale: {
-            "path": "data/sales_df_train.csv",
+            "path": "../data/sales_df_train.csv",
             "mapping": {
                 "store": {"csv_name": "st_id", "reference": Store},
                 "sku": {"csv_name": "pr_sku_id", "reference": SKU},
