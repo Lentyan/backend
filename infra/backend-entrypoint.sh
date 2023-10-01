@@ -1,0 +1,33 @@
+#!/bin/sh
+
+until cd /app/src/
+do
+    echo "Waiting for server volume..."
+    sleep 10
+done
+
+# Apply database migrations
+until python manage.py migrate
+do
+    echo "Waiting for db to be ready..."
+    sleep 10
+done
+
+# Load initial data (fixtures)
+echo "Load initial data"
+until python manage.py fill_db
+do
+    echo "Waiting for data to be loaded..."
+    sleep 10
+done
+
+# Collecting static
+until python manage.py collectstatic --noinput
+do
+    echo "Collecting static ..."
+    sleep 5
+done
+
+# Start server
+echo "Starting server ..."
+gunicorn configs.wsgi:application --bind 0.0.0.0:8000
