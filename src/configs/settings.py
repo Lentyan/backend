@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -27,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "Default key")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -76,11 +77,22 @@ TEMPLATES = [
 WSGI_APPLICATION = "configs.wsgi.application"
 
 DATABASES = {
-    "default": {
+    "test": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
-    }
+    },
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": env.str("POSTGRES_HOST"),
+        "PORT": env.str("POSTGRES_PORT"),
+        "NAME": env.str("POSTGRES_DB"),
+        "USER": env.str("POSTGRES_USER"),
+        "PASSWORD": env.str("POSTGRES_PASSWORD"),
+    },
 }
+
+if "test" in sys.argv:
+    DATABASES["default"] = DATABASES["test"]
 
 AUTH_USER_MODEL = "users.User"
 
@@ -112,6 +124,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = str(BASE_DIR / "static")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
