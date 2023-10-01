@@ -1,24 +1,54 @@
-version: "3.8"
+version: "3.9"
 
 services:
 
   db:
     container_name: postgres_database
     image: postgres:14.7-alpine
+    volumes:
+      - postgres_db:/var/lib/postgresql/data/
+    environment:
+      PGDATA: "/var/lib/postgresql/data/pgdata"
     env_file:
-      - .env
+      - ./.env
+    restart: always
+    networks:
+      - django_network
 
   backend:
+    container_name: django_backend
     build:
       context: ..
       dockerfile: ./infra/Dockerfile
-    container_name: django_backend
+    entrypoint: ./infra/backend-entrypoint.sh
+    volumes:
+      - ../static:/app/src/static
     depends_on:
       - db
     restart: always
     env_file:
-      - .env
+      - ./.env
+    networks:
+      - django_network
 
+  nginx:
+    image: nginx:1.21.3-alpine
+    container_name: spread-wings-nginx
+    ports:
+      - "80:${NGINX_PORT}"
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template
+      - ../static:/var/html/static/
+    env_file:
+      - ./.env
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - django_network
 
 volumes:
-  postgres_data:
+  postgres_db:
+
+networks:
+  django_network:
