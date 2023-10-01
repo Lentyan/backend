@@ -12,7 +12,7 @@ class SKUViewSetTest(TestCase):
 
     def setUp(self):
         """Create sample client and SKU for testing."""
-        self.url = "/api/v1/categories/"
+        self.url = "/api/v1/skus/"
         self.user = User.objects.create_user(
             email="test@mail.com",
             first_name="FirstName",
