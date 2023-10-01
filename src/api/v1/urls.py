@@ -15,7 +15,12 @@ schema_view = get_schema_view(
 )
 
 v1_router = DefaultRouter()
-v1_router.register(r"categories", views.SKUViewSet, basename="categories")
+v1_router.register(r"skus", views.SKUViewSet, basename="skus")
+v1_router.register(r"groups", views.GroupViewSet, basename="groups")
+v1_router.register(r"categories", views.CategoryViewSet, basename="categories")
+v1_router.register(
+    r"subcategories", views.SubcategoryViewSet, basename="subcategories"
+)
 v1_router.register(r"shops", views.StoreViewSet, basename="shops")
 v1_router.register(r"sales", views.SaleViewSet, basename="sales")
 v1_router.register(r"forecasts", views.ForecastViewSet, basename="forecasts")
