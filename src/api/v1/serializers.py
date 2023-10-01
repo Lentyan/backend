@@ -12,6 +12,7 @@ class SKUSerializer(serializers.ModelSerializer):
 
         model = SKU
         fields = (
+            "id",
             "sku",
             "group",
             "category",
@@ -46,6 +47,7 @@ class StoreSerializer(serializers.ModelSerializer):
 
         model = Store
         fields = (
+            "id",
             "store",
             "city",
             "division",
