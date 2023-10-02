@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "corsheaders",
     "drf_yasg",
     "djoser",
     "django_filters",
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -99,19 +101,19 @@ AUTH_USER_MODEL = "users.User"
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation"
-        ".UserAttributeSimilarityValidator",
+                ".UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation"
-        ".MinimumLengthValidator",
+                ".MinimumLengthValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation"
-        ".CommonPasswordValidator",
+                ".CommonPasswordValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation"
-        ".NumericPasswordValidator",
+                ".NumericPasswordValidator",
     },
 ]
 
@@ -129,11 +131,13 @@ STATIC_ROOT = str(BASE_DIR / "static")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",  # noqa
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    # noqa
     "DEFAULT_VERSION": "v1",
     "ALLOWED_VERSIONS": ["v1"],
     "VERSION_PARAM": "version",
-    "DEFAULT_PAGINATION_CLASS": "api.v1.pagination.PageNumberPaginationWithLimit",  # noqa
+    "DEFAULT_PAGINATION_CLASS": "api.v1.pagination.PageNumberPaginationWithLimit",
+    # noqa
     "PAGE_SIZE": 5,
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
     "DEFAULT_PERMISSION_CLASSES": [
@@ -157,3 +161,4 @@ SWAGGER_SETTINGS = {
         },
     },
 }
+CORS_ALLOW_ALL_ORIGINS = True
