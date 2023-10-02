@@ -19,7 +19,8 @@ class MultipleValueField(MultipleChoiceField):
 
     def clean(self, values):
         """Clean a list of values using the inner field's cleaning."""
-        return values and [self.inner_field.clean(value) for value in values]
+        return values and [self.inner_field.clean(value) for value in
+                           values]
 
 
 class MultipleValueFilter(Filter):
@@ -40,16 +41,25 @@ class ForecastFilter(django_filters.FilterSet):
     This filter class defines filters for the Forecast model,
     allowing to filter forecasts based on store, SKU, and forecast date.
     """
+    store = MultipleValueFilter(field_class=IntegerField)
+    sku = MultipleValueFilter(field_class=IntegerField)
+    forecast_date = django_filters.DateTimeFilter()
+    forecast_date__gte = django_filters.NumberFilter(
+        field_name="forecast_date", lookup_expr="gte"
+    )
+    forecast_date__lte = django_filters.NumberFilter(
+        field_name="forecast_date", lookup_expr="lte"
+    )
 
     class Meta:
         """Meta of filter class for Forecast model."""
 
         model = Forecast
-        fields = {
-            "store": ["exact"],
-            "sku": ["exact"],
-            "forecast_date": ["exact", "gte", "lte"],
-        }
+        fields = [
+            "store",
+            "sku",
+            "forecast_date",
+        ]
 
 
 class SaleFilter(django_filters.FilterSet):
