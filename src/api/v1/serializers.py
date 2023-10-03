@@ -107,3 +107,19 @@ class UserSerializer(serializers.ModelSerializer):
 
         model = User
         fields = ("email", "first_name", "last_name")
+
+
+class ForecastReportSerializer(serializers.Serializer):
+    """Forecast report serializer."""
+
+    store_ids = serializers.ListField(child=serializers.IntegerField())
+    groups = serializers.ListField(child=serializers.CharField())
+    categories = serializers.ListField(
+        child=serializers.CharField(), required=False
+    )
+    subcategories = serializers.ListField(
+        child=serializers.CharField(), required=False
+    )
+    sku_ids = serializers.ListField(
+        child=serializers.IntegerField(), required=False
+    )
