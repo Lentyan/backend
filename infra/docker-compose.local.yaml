@@ -32,7 +32,7 @@ services:
 
   nginx:
     image: nginx:1.21.3-alpine
-    container_name: spread-wings-nginx
+    container_name: nginx
     ports:
       - "80:${NGINX_PORT}"
     volumes:
