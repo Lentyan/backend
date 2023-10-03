@@ -23,7 +23,7 @@ class Store(models.Model):
 
     store = models.CharField(
         max_length=255,
-        verbose_name="Название магазин",
+        verbose_name="Название магазина",
     )
     city = models.CharField(
         max_length=255,
@@ -230,7 +230,7 @@ class Forecast(models.Model):
         Store,
         related_name="store_forecasts",
         on_delete=models.DO_NOTHING,
-        verbose_name="Название магазин",
+        verbose_name="Название магазина",
     )
     sku = models.ForeignKey(
         SKU,
