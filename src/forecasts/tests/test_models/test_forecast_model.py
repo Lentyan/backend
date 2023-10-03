@@ -61,7 +61,7 @@ class ForecastModelTestCase(TestCase):
     def test_model_verbose_names(self):
         """Test the verbose names of model fields."""
         self.assertEqual(
-            Forecast._meta.get_field("store").verbose_name, "Магазин"
+            Forecast._meta.get_field("store").verbose_name, "Название магазина"
         )
         self.assertEqual(Forecast._meta.get_field("sku").verbose_name, "Товар")
         self.assertEqual(

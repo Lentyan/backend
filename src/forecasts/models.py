@@ -23,7 +23,7 @@ class Store(models.Model):
 
     store = models.CharField(
         max_length=255,
-        verbose_name="Магазин",
+        verbose_name="Название магазина",
     )
     city = models.CharField(
         max_length=255,
@@ -117,7 +117,7 @@ class SKU(models.Model):
     )
     sku = models.CharField(
         max_length=256,
-        verbose_name="СКЮ",
+        verbose_name="Наименование товара",
     )
     uom = models.IntegerField(
         verbose_name="Единицы измерения",
@@ -176,7 +176,7 @@ class Sale(models.Model):
         SKU,
         related_name="sku_sales",
         on_delete=models.DO_NOTHING,
-        verbose_name="Товар",
+        verbose_name="Наименование товара",
     )
     date = models.DateTimeField(verbose_name="Дата продажи")
     sales_type = models.BooleanField(verbose_name="Наличие промо")
@@ -230,7 +230,7 @@ class Forecast(models.Model):
         Store,
         related_name="store_forecasts",
         on_delete=models.DO_NOTHING,
-        verbose_name="Магазин",
+        verbose_name="Название магазина",
     )
     sku = models.ForeignKey(
         SKU,
@@ -241,6 +241,7 @@ class Forecast(models.Model):
 
     forecast_date = models.DateTimeField(
         verbose_name="Дата прогноза",
+        auto_now_add=True,
     )
     forecast = models.JSONField(
         verbose_name="Прогноз",
