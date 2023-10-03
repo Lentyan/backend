@@ -63,7 +63,9 @@ class SaleModelTestCase(TestCase):
     def test_model_verbose_names(self):
         """Test the verbose names of model fields."""
         self.assertEqual(Sale._meta.get_field("store").verbose_name, "Магазин")
-        self.assertEqual(Sale._meta.get_field("sku").verbose_name, "Товар")
+        self.assertEqual(
+            Sale._meta.get_field("sku").verbose_name, "Наименование товара"
+        )
         self.assertEqual(
             Sale._meta.get_field("date").verbose_name, "Дата продажи"
         )
