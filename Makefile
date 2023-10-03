@@ -23,9 +23,19 @@ run-unittests: # Run Django unit tests:
 	@echo -e "$(COLOR_GREEN)Dev server is running$(COLOR_RESET)"
 
 .PHONY: run-local
-run-local: #Run Django DRF app with infrastructure
-	@if command -v docker &> /dev/null; then \
-        docker-compose -f $(LOCAL_COMPOSE_FILE) up -d; \
-    else \
-        echo "Docker is not installed"; \
-    fi
+run-local: remove-images up #Run Django DRF app with infrastructure
+
+
+.PHONY: stop
+stop: #Stop Django DRF app with infrastructure
+	@docker-compose -f $(LOCAL_COMPOSE_FILE) down
+
+
+.PHONY: remove-images
+remove-images: #Stop and remove images
+	@docker-compose -f $(LOCAL_COMPOSE_FILE) down --rmi local
+
+
+.PHONY: up
+up: #Up Django DRF app with infrastructure
+	@docker-compose -f $(LOCAL_COMPOSE_FILE) up -d
