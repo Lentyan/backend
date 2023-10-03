@@ -1,10 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from api.v1 import filters, serializers
+from api.v1.serializers import ForecastReportSerializer
+from api.v1.utils.report_utils import generate_forecast_report
 from forecasts import models
 from users.models import User
 
@@ -152,3 +154,19 @@ class UserViewSet(viewsets.GenericViewSet):
         """Retrieve the authenticated user's information."""
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+
+class GenerateForecastReport(views.APIView):
+    """API view to generate forecast report."""
+
+    def post(self, request, *args, **kwargs):
+        """Post request handler."""
+        serializer = ForecastReportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {"error": "Invalid filter data"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        response = generate_forecast_report(serializer.validated_data)
+        return response
