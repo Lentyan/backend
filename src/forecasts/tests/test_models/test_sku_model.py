@@ -53,7 +53,9 @@ class SKUModelTestCase(TestCase):
         self.assertEqual(
             SKU._meta.get_field("subcategory").verbose_name, "Подкатегория"
         )
-        self.assertEqual(SKU._meta.get_field("sku").verbose_name, "СКЮ")
+        self.assertEqual(
+            SKU._meta.get_field("sku").verbose_name, "Наименование товара"
+        )
         self.assertEqual(
             SKU._meta.get_field("uom").verbose_name, "Единицы измерения"
         )
