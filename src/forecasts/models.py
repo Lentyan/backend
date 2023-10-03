@@ -241,6 +241,7 @@ class Forecast(models.Model):
 
     forecast_date = models.DateTimeField(
         verbose_name="Дата прогноза",
+        auto_now_add=True,
     )
     forecast = models.JSONField(
         verbose_name="Прогноз",
