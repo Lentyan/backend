@@ -4,7 +4,7 @@ from itertools import islice
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
-from forecasts.models import SKU, Sale, Store
+from forecasts.models import SKU, Forecast, Sale, Store
 
 
 class Command(BaseCommand):
@@ -58,6 +58,14 @@ class Command(BaseCommand):
                     "csv_name": "pr_promo_sales_in_rub",
                     "type": float,
                 },
+            },
+        },
+        Forecast: {
+            "path": "../data/forecasts.csv",
+            "mapping": {
+                "store": {"csv_name": "st_id", "reference": Store},
+                "sku": {"csv_name": "pr_sku_id", "reference": SKU},
+                "forecast": {"csv_name": "forecast"},
             },
         },
     }
