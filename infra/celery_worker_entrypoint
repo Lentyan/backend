@@ -1,0 +1,7 @@
+#!/bin/sh
+
+until cd /app/src/; do
+  echo "Waiting for server volume..."
+done
+
+celery -A configs worker --loglevel=info
