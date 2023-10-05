@@ -123,3 +123,17 @@ class ForecastReportSerializer(serializers.Serializer):
     sku_ids = serializers.ListField(
         child=serializers.IntegerField(), required=False
     )
+
+
+class ForecastUploadSerializer(serializers.Serializer):
+    """Load forecast from csv serializer."""
+
+    csv_file = serializers.FileField()
+
+    def validate_csv_file(self, csv_file):
+        """Validate csv file format."""
+        if not csv_file.name.endswith(".csv"):
+            raise serializers.ValidationError(
+                "File must have a CSV extension."
+            )
+        return csv_file
