@@ -15,15 +15,40 @@ services:
     networks:
       - django_network
 
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - django_network
+
   backend:
     container_name: django_backend
     build:
       context: ..
       dockerfile: ./infra/Dockerfile
+    entrypoint: ./infra/backend_entrypoint
     volumes:
       - ../static:/app/src/static
     depends_on:
       - db
+    restart: always
+    env_file:
+      - ./.env
+    networks:
+      - django_network
+
+  celery:
+    container_name: celery_worker
+    build:
+      context: ..
+      dockerfile: ./infra/Dockerfile
+    entrypoint: ./infra/celery_worker_entrypoint
+    volumes:
+      - ../static:/app/src/static
+    depends_on:
+      - db
+      - redis
+      - backend
     restart: always
     env_file:
       - ./.env

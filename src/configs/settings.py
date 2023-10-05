@@ -101,19 +101,19 @@ AUTH_USER_MODEL = "users.User"
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation"
-                ".UserAttributeSimilarityValidator",
+        ".UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation"
-                ".MinimumLengthValidator",
+        ".MinimumLengthValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation"
-                ".CommonPasswordValidator",
+        ".CommonPasswordValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation"
-                ".NumericPasswordValidator",
+        ".NumericPasswordValidator",
     },
 ]
 
@@ -162,3 +162,8 @@ SWAGGER_SETTINGS = {
     },
 }
 CORS_ALLOW_ALL_ORIGINS = True
+
+REDIS_URL = env.str("REDIS_URL", default="redis://redis:6379")
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_TIMEZONE = TIME_ZONE
