@@ -30,7 +30,6 @@ v1_router.register(r"user", views.UserViewSet, basename="user")
 
 urlpatterns = [
     path("", include(v1_router.urls)),
-    path("generate_report/", views.GenerateForecastReport.as_view()),
     path("auth/", include("djoser.urls.jwt")),
     path(
         "swagger/",

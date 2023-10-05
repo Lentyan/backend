@@ -249,9 +249,7 @@ class Forecast(models.Model):
 
     def __str__(self):
         """Return forecast data as str."""
-        return (
-            f"{self.sku} forecast for " f"{self.store} at {self.forecast_date}"
-        )
+        return f"{self.sku} forecast for {self.store} at {self.forecast_date}"
 
     class Meta:
         """Forecast model meta data."""

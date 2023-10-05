@@ -1,14 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from api.v1 import filters, serializers
-from api.v1.serializers import ForecastReportSerializer
 from api.v1.utils.report_utils import generate_forecast_report
 from forecasts import models
+from forecasts.utils.csv_utils import import_data, read_csv_file
 from users.models import User
 
 
@@ -129,7 +128,7 @@ class SaleViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = filters.SaleFilter
 
 
-class ForecastViewSet(viewsets.ModelViewSet):
+class ForecastViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A view set for the Forecast model.
 
@@ -141,6 +140,42 @@ class ForecastViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ForecastSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.ForecastFilter
+
+    @action(
+        methods=["post"],
+        detail=False,
+        permission_classes=[permissions.AllowAny],
+        serializer_class=serializers.ForecastUploadSerializer,
+    )
+    def post_forecasts(self, request):
+        """
+        Upload forecasts data from a CSV file.
+
+        This action allows users to upload forecasts data from a CSV file.
+        """
+        serializer = serializers.ForecastUploadSerializer(data=request.data)
+        if serializer.is_valid():
+            csv_reader = read_csv_file(serializer.validated_data["csv_file"])
+            import_data(models.Forecast, csv_reader)
+            return Response(
+                {"message": "CSV is valid"}, status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        methods=["post"],
+        detail=False,
+        serializer_class=serializers.ForecastReportSerializer,
+    )
+    def generate_report(self, request, *args, **kwargs):
+        """Generate forecast report."""
+        serializer = serializers.ForecastReportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {"error": "Invalid filter data"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return generate_forecast_report(serializer.validated_data)
 
 
 class UserViewSet(viewsets.GenericViewSet):
@@ -155,21 +190,3 @@ class UserViewSet(viewsets.GenericViewSet):
         """Retrieve the authenticated user's information."""
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
-
-
-class GenerateForecastReport(GenericAPIView):
-    """API view to generate forecast report."""
-
-    serializer_class = ForecastReportSerializer
-
-    def post(self, request, *args, **kwargs):
-        """Post request handler."""
-        serializer = self.get_serializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(
-                {"error": "Invalid filter data"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        response = generate_forecast_report(serializer.validated_data)
-        return response
