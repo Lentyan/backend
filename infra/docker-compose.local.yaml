@@ -28,7 +28,8 @@ services:
       dockerfile: ./infra/Dockerfile
     entrypoint: ./infra/backend_entrypoint
     volumes:
-      - ../static:/app/src/static
+      - ../src/static:/app/src/static
+      - ../src/media:/app/src/media
     depends_on:
       - db
     restart: always
@@ -44,7 +45,8 @@ services:
       dockerfile: ./infra/Dockerfile
     entrypoint: ./infra/celery_worker_entrypoint
     volumes:
-      - ../static:/app/src/static
+      - ../src/static:/app/src/static
+      - ../src/media:/app/src/media
     depends_on:
       - db
       - redis
@@ -62,7 +64,8 @@ services:
       - "80:${NGINX_PORT}"
     volumes:
       - ./nginx.conf.template:/etc/nginx/templates/default.conf.template
-      - ../static:/var/html/static/
+      - ../src/static:/var/html/static/
+      - ../src/media:/var/html/media/
     env_file:
       - ./.env
     depends_on:
@@ -73,6 +76,9 @@ services:
 
 volumes:
   postgres_db:
+  static:
+  media:
+
 
 networks:
   django_network:
