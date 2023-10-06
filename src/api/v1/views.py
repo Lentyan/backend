@@ -7,14 +7,14 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from api.v1 import filters, serializers
 from forecasts import models
-from forecasts.models import AsyncFileResults
-from forecasts.tasks import generate_report
+from forecasts.models import AsyncFileResults, Forecast
+from forecasts.tasks import forecast_tasks
 from forecasts.utils.csv_utils import import_data, read_csv_file
 from users.models import User
 
@@ -53,6 +53,17 @@ class ListOnlyViewSet(mixins.ListModelMixin, GenericViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer({self.list_key: queryset})
         return Response(serializer.data)
+
+
+class GetOrCreateViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet,
+):
+    """View set to create or get model instances."""
+
+    pass
 
 
 class SKUViewSet(viewsets.ReadOnlyModelViewSet):
@@ -136,7 +147,7 @@ class SaleViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = filters.SaleFilter
 
 
-class ForecastViewSet(viewsets.ReadOnlyModelViewSet):
+class ForecastViewSet(GetOrCreateViewSet):
     """
     A view set for the Forecast model.
 
@@ -145,23 +156,47 @@ class ForecastViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = models.Forecast.objects.all()
-    serializer_class = serializers.ForecastSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.ForecastFilter
+    serializer_class = serializers.ForecastSerializer
+
+    def get_serializer_class(self):
+        """Return appropriate to method serializer."""
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_class()
+        return serializers.ForecastPostSerializer
+
+    def create(self, request, *args, **kwargs):
+        """Bulk create forecasts."""
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            forecasts_objects = [
+                Forecast(**attrs)
+                for attrs in serializer.validated_data.get("data")
+            ]
+            forecasts = Forecast.objects.bulk_create(
+                forecasts_objects,
+                ignore_conflicts=True,
+            )
+            return Response(
+                serializers.ForecastSerializer(forecasts, many=True).data,
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         methods=["post"],
         detail=False,
         permission_classes=[permissions.AllowAny],
-        serializer_class=serializers.ForecastUploadSerializer,
+        serializer_class=serializers.ForecastPostSerializer,
     )
-    def post_forecasts(self, request):
+    def create_from_csv(self, request):
         """
         Upload forecasts data from a CSV file.
 
         This action allows users to upload forecasts data from a CSV file.
         """
-        serializer = serializers.ForecastUploadSerializer(data=request.data)
+        serializer = serializers.ForecastFromCSVSerializer(data=request.data)
         if serializer.is_valid():
             csv_reader = read_csv_file(serializer.validated_data["csv_file"])
             import_data(models.Forecast, csv_reader)
@@ -182,7 +217,7 @@ class ForecastViewSet(viewsets.ReadOnlyModelViewSet):
             data=request.data,
         )
         if serializer.is_valid():
-            task = generate_report.delay(
+            task = forecast_tasks.generate_report.delay(
                 request.user.id,
                 serializer.validated_data,
             )
