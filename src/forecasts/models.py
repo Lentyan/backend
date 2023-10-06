@@ -1,4 +1,7 @@
+import os
+
 import pytz
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -281,3 +284,32 @@ class Forecast(models.Model):
                 )
             ),
         ]
+
+
+class AsyncFileResults(models.Model):
+    """Model representing results of files generation."""
+
+    task_id = models.CharField(
+        blank=False,
+        max_length=255,
+        null=False,
+        verbose_name="task id",
+        db_index=True,
+    )
+    user_id = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1),
+        ]
+    )
+    filters = models.JSONField(blank=True, null=True)
+    result = models.FileField(upload_to="files/reports/%Y/%m/%d/")
+    errors = models.JSONField(blank=True, null=True)
+    created_at = models.DateField(
+        verbose_name="date created",
+        auto_now_add=True,
+    )
+
+    @property
+    def successful(self):
+        """Check if file generation was successful."""
+        return self.errors == "null" and os.path.exists(self.result.path)
