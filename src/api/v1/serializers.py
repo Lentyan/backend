@@ -1,4 +1,7 @@
+from datetime import date
+
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from forecasts.models import SKU, Forecast, Sale, Store
 from users.models import User
@@ -109,8 +112,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("email", "first_name", "last_name")
 
 
-class ForecastReportSerializer(serializers.Serializer):
-    """Forecast report serializer."""
+class CreateForecastReportSerializer(serializers.Serializer):
+    """Create forecast report serializer."""
 
     store_ids = serializers.ListField(child=serializers.IntegerField())
     groups = serializers.ListField(child=serializers.CharField())
@@ -123,6 +126,30 @@ class ForecastReportSerializer(serializers.Serializer):
     sku_ids = serializers.ListField(
         child=serializers.IntegerField(), required=False
     )
+
+    from_date = serializers.DateField(required=False)
+    to_date = serializers.DateField(required=False)
+
+    def validate_store_ids(self, store_ids):
+        """Validate store_ids are all positive."""
+        if not all(map(lambda store_id: store_id > 0, store_ids)):
+            raise ValidationError(
+                "store_ids must contain positive values.",
+            )
+        return store_ids
+
+    def validate_to_date(self, to_date):
+        """Validate to_date is later than or equal to from_date."""
+        from_date = self.initial_data.get("from_date")
+        if from_date and not to_date:
+            raise serializers.ValidationError(
+                "to_date is required when from_date is specified."
+            )
+        if from_date and to_date < date.fromisoformat(str(from_date)):
+            raise serializers.ValidationError(
+                "to_date cant be earlier than from_date."
+            )
+        return to_date
 
 
 class ForecastUploadSerializer(serializers.Serializer):

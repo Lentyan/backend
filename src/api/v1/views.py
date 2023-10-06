@@ -1,12 +1,20 @@
+import json
+
+from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from api.v1 import filters, serializers
-from api.v1.utils.report_utils import generate_forecast_report
 from forecasts import models
+from forecasts.models import AsyncFileResults
+from forecasts.tasks import generate_report
 from forecasts.utils.csv_utils import import_data, read_csv_file
 from users.models import User
 
@@ -165,17 +173,55 @@ class ForecastViewSet(viewsets.ReadOnlyModelViewSet):
     @action(
         methods=["post"],
         detail=False,
-        serializer_class=serializers.ForecastReportSerializer,
+        serializer_class=serializers.CreateForecastReportSerializer,
+        permission_classes=(IsAuthenticated,),
     )
     def generate_report(self, request, *args, **kwargs):
         """Generate forecast report."""
-        serializer = serializers.ForecastReportSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(
-                {"error": "Invalid filter data"},
-                status=status.HTTP_400_BAD_REQUEST,
+        serializer = serializers.CreateForecastReportSerializer(
+            data=request.data,
+        )
+        if serializer.is_valid():
+            task = generate_report.delay(
+                request.user.id,
+                serializer.validated_data,
             )
-        return generate_forecast_report(serializer.validated_data)
+            return Response(
+                {"task_id": task.task_id}, status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "task_id",
+                openapi.IN_QUERY,
+                description="id of task to generate report",
+                type=openapi.TYPE_STRING,
+            ),
+        ]
+    )
+    @action(
+        methods=["get"], detail=False, permission_classes=(IsAuthenticated,)
+    )
+    def get_report(self, request, *args, **kwargs):
+        """Generate forecast report."""
+        task_id = request.query_params.get("task_id", None)
+        file_result = get_object_or_404(
+            AsyncFileResults,
+            task_id=task_id,
+            user_id=request.user.id,
+        )
+        if not file_result.successful:
+            return Response(**json.loads(file_result.errors))
+        return FileResponse(
+            file_result.result,
+            as_attachment=True,
+            status=status.HTTP_200_OK,
+        )
 
 
 class UserViewSet(viewsets.GenericViewSet):
