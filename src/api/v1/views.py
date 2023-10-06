@@ -88,6 +88,8 @@ class GroupViewSet(ListOnlyViewSet):
 
     queryset = models.SKU.objects.all()
     serializer_class = serializers.GroupSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = filters.GroupFilter
     list_key = "groups"
     model_filed = "group"
 
