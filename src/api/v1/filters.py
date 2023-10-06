@@ -41,14 +41,24 @@ class ForecastFilter(django_filters.FilterSet):
     allowing to filter forecasts based on store, SKU, and forecast date.
     """
 
-    store = MultipleValueFilter(field_class=IntegerField)
-    sku = MultipleValueFilter(field_class=IntegerField)
-    forecast_date = django_filters.DateTimeFilter()
-    forecast_date__gte = django_filters.NumberFilter(
-        field_name="forecast_date", lookup_expr="gte"
+    store = MultipleValueFilter(
+        field_class=IntegerField,
+        field_name="store_id",
     )
-    forecast_date__lte = django_filters.NumberFilter(
-        field_name="forecast_date", lookup_expr="lte"
+    sku = MultipleValueFilter(
+        field_class=IntegerField,
+        field_name="sku_id",
+    )
+    forecast_date = django_filters.DateTimeFilter(
+        field_name="forecast_date",
+    )
+    forecast_date__gte = django_filters.DateTimeFilter(
+        field_name="forecast_date",
+        lookup_expr="gte",
+    )
+    forecast_date__lte = django_filters.DateTimeFilter(
+        field_name="forecast_date",
+        lookup_expr="lte",
     )
 
     class Meta:

@@ -4,7 +4,7 @@ from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import mixins, permissions, status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
@@ -63,10 +63,14 @@ class GetOrCreateViewSet(
 ):
     """View set to create or get model instances."""
 
-    pass
+    def paginate_queryset(self, queryset):
+        """Turn off pagination is required."""
+        if self.request.query_params.get("limit") == "false":
+            return None
+        return super().paginate_queryset(queryset)
 
 
-class SKUViewSet(viewsets.ReadOnlyModelViewSet):
+class SKUViewSet(GetOrCreateViewSet):
     """
     A view set for the SKU model.
 
@@ -124,7 +128,7 @@ class SubcategoryViewSet(ListOnlyViewSet):
     model_filed = "subcategory"
 
 
-class StoreViewSet(viewsets.ReadOnlyModelViewSet):
+class StoreViewSet(GetOrCreateViewSet):
     """
     A view set for the Store model.
 
@@ -135,7 +139,7 @@ class StoreViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.StoreSerializer
 
 
-class SaleViewSet(viewsets.ReadOnlyModelViewSet):
+class SaleViewSet(GetOrCreateViewSet):
     """
     A view set for the Sale model.
 
@@ -160,12 +164,11 @@ class ForecastViewSet(GetOrCreateViewSet):
     queryset = models.Forecast.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.ForecastFilter
-    serializer_class = serializers.ForecastSerializer
 
     def get_serializer_class(self):
         """Return appropriate to method serializer."""
         if self.request.method in SAFE_METHODS:
-            return super().get_serializer_class()
+            return serializers.ForecastSerializer
         return serializers.ForecastPostSerializer
 
     def create(self, request, *args, **kwargs):
@@ -189,8 +192,7 @@ class ForecastViewSet(GetOrCreateViewSet):
     @action(
         methods=["post"],
         detail=False,
-        permission_classes=[permissions.AllowAny],
-        serializer_class=serializers.ForecastPostSerializer,
+        serializer_class=serializers.ForecastFromCSVSerializer,
     )
     def create_from_csv(self, request):
         """
@@ -212,6 +214,7 @@ class ForecastViewSet(GetOrCreateViewSet):
         detail=False,
         serializer_class=serializers.CreateForecastReportSerializer,
         permission_classes=(IsAuthenticated,),
+        filter_backends=None,
     )
     def generate_report(self, request, *args, **kwargs):
         """Generate forecast report."""
@@ -236,13 +239,17 @@ class ForecastViewSet(GetOrCreateViewSet):
             openapi.Parameter(
                 "task_id",
                 openapi.IN_QUERY,
-                description="id of task to generate report",
+                description="Id of task to generate report",
                 type=openapi.TYPE_STRING,
             ),
         ]
     )
     @action(
-        methods=["get"], detail=False, permission_classes=(IsAuthenticated,)
+        methods=["get"],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        filter_backends=None,
+        pagination_class=None,
     )
     def get_report(self, request, *args, **kwargs):
         """Generate forecast report."""
