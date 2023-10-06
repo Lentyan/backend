@@ -138,12 +138,21 @@ class CreateForecastReportSerializer(serializers.Serializer):
             )
         return store_ids
 
+    def validate_from_date(self, from_date):
+        """Validate from_date and to_date are present."""
+        to_date = self.initial_data.get("to_date")
+        if from_date and not to_date:
+            raise serializers.ValidationError(
+                "to_date is required when from_date is specified."
+            )
+        return from_date
+
     def validate_to_date(self, to_date):
         """Validate to_date is later than or equal to from_date."""
         from_date = self.initial_data.get("from_date")
         if from_date and not to_date:
             raise serializers.ValidationError(
-                "to_date is required when from_date is specified."
+                "from_date is required when to_date is specified."
             )
         if from_date and to_date < date.fromisoformat(str(from_date)):
             raise serializers.ValidationError(
