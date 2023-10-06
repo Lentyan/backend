@@ -1,1 +1,1 @@
-from .forecast_tasks import generate_report  # noqa
+from . import forecast_tasks  # noqa
