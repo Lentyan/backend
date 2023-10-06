@@ -90,6 +90,10 @@ class ForecastSerializer(serializers.ModelSerializer):
         queryset=SKU.objects.all(),
     )
 
+    forecast_date = serializers.DateTimeField()
+
+    forecast = serializers.JSONField()
+
     class Meta:
         """Forecast model serializer meta."""
 
@@ -100,6 +104,26 @@ class ForecastSerializer(serializers.ModelSerializer):
             "forecast_date",
             "forecast",
         )
+
+
+class ForecastPostSerializer(serializers.Serializer):
+    """Bulk load forecast serializer."""
+
+    data = serializers.ListSerializer(child=ForecastSerializer())
+
+
+class ForecastFromCSVSerializer(serializers.Serializer):
+    """Load forecast from csv serializer."""
+
+    csv_file = serializers.FileField()
+
+    def validate_csv_file(self, csv_file):
+        """Validate csv file format."""
+        if not csv_file.name.endswith(".csv"):
+            raise serializers.ValidationError(
+                "File must have a CSV extension."
+            )
+        return csv_file
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -159,17 +183,3 @@ class CreateForecastReportSerializer(serializers.Serializer):
                 "to_date cant be earlier than from_date."
             )
         return to_date
-
-
-class ForecastUploadSerializer(serializers.Serializer):
-    """Load forecast from csv serializer."""
-
-    csv_file = serializers.FileField()
-
-    def validate_csv_file(self, csv_file):
-        """Validate csv file format."""
-        if not csv_file.name.endswith(".csv"):
-            raise serializers.ValidationError(
-                "File must have a CSV extension."
-            )
-        return csv_file
