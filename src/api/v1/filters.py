@@ -19,8 +19,7 @@ class MultipleValueField(MultipleChoiceField):
 
     def clean(self, values):
         """Clean a list of values using the inner field's cleaning."""
-        return values and [self.inner_field.clean(value) for value in
-                           values]
+        return values and [self.inner_field.clean(value) for value in values]
 
 
 class MultipleValueFilter(Filter):
@@ -41,6 +40,7 @@ class ForecastFilter(django_filters.FilterSet):
     This filter class defines filters for the Forecast model,
     allowing to filter forecasts based on store, SKU, and forecast date.
     """
+
     store = MultipleValueFilter(field_class=IntegerField)
     sku = MultipleValueFilter(field_class=IntegerField)
     forecast_date = django_filters.DateTimeFilter()
@@ -110,23 +110,42 @@ class SKUFilter(django_filters.FilterSet):
         ]
 
 
-class CategoryFilter(django_filters.FilterSet):
+class GroupFilter(django_filters.FilterSet):
     """
-    Filter class for SKU categories.
+    Filter class for SKU groups.
 
-    This filter class defines filters for the SKU categories,
-    allowing to filter categories based on groups.
+    This filter class defines filters for the SKU groups,
+    allowing to filter categories based on stores.
     """
 
-    group = MultipleValueFilter(field_class=CharField)
+    store = MultipleValueFilter(
+        field_class=IntegerField,
+        field_name="sku_sales__store_id",
+    )
 
     class Meta:
         """Meta of filter class for SKU categories."""
 
         model = SKU
         fields = [
-            "group",
+            "store",
         ]
+
+
+class CategoryFilter(GroupFilter):
+    """
+    Filter class for SKU categories.
+
+    This filter class defines filters for the SKU categories,
+    allowing to filter categories based on groups and stores.
+    """
+
+    group = MultipleValueFilter(field_class=CharField)
+
+    class Meta(GroupFilter.Meta):
+        """Meta of filter class for SKU categories."""
+
+        fields = GroupFilter.Meta.fields + ["group"]
 
 
 class SubcategoryFiler(CategoryFilter):
@@ -134,7 +153,7 @@ class SubcategoryFiler(CategoryFilter):
     Filter class for SKU subcategories.
 
     This filter class defines filters for the SKU subcategories,
-    allowing to filter subcategories based on groups and categories.
+    allowing to filter subcategories based on stores, groups, categories.
     """
 
     category = MultipleValueFilter(field_class=CharField)
