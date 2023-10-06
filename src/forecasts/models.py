@@ -6,6 +6,75 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+class SKU(models.Model):
+    """Model representing SKUs information."""
+
+    class UOMChoices(models.Choices):
+        """SKU uom field choices."""
+
+        BY_WEIGHT = 17
+        BY_PIECE = 1
+
+    group = models.CharField(
+        max_length=255,
+        verbose_name="Группа",
+    )
+    category = models.CharField(
+        max_length=255,
+        verbose_name="Категория",
+    )
+    subcategory = models.CharField(
+        max_length=256,
+        verbose_name="Подкатегория",
+    )
+    sku = models.CharField(
+        max_length=256,
+        verbose_name="Наименование товара",
+    )
+    uom = models.IntegerField(
+        verbose_name="Единицы измерения",
+        choices=UOMChoices.choices,
+    )
+
+    class Meta:
+        """SKU model metadata."""
+
+        verbose_name = _(
+            "Товар",
+        )
+        verbose_name_plural = _(
+            "Товары",
+        )
+        ordering = ("id",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "group",
+                    "category",
+                    "subcategory",
+                    "sku",
+                    "uom",
+                ),
+                name="unique_SKUs",
+            )
+        ]
+        indexes = [
+            models.Index(
+                fields=(
+                    "group",
+                    "category",
+                    "subcategory",
+                    "sku",
+                    "uom",
+                )
+            ),
+        ]
+
+    def __str__(self):
+        """Return capitalized SKU name."""
+        return self.sku.capitalize()
+
+
 class Store(models.Model):
     """Model representing stores information."""
 
@@ -23,6 +92,12 @@ class Store(models.Model):
         SECOND = 2
         THIRD = 3
         FOURTH = 4
+
+    skus = models.ManyToManyField(
+        SKU,
+        related_name="stores",
+        through="Sale",
+    )
 
     store = models.CharField(
         max_length=255,
@@ -95,75 +170,6 @@ class Store(models.Model):
     def __str__(self):
         """Return capitalized store name."""
         return self.store.capitalize()
-
-
-class SKU(models.Model):
-    """Model representing SKUs information."""
-
-    class UOMChoices(models.Choices):
-        """SKU uom field choices."""
-
-        BY_WEIGHT = 17
-        BY_PIECE = 1
-
-    group = models.CharField(
-        max_length=255,
-        verbose_name="Группа",
-    )
-    category = models.CharField(
-        max_length=255,
-        verbose_name="Категория",
-    )
-    subcategory = models.CharField(
-        max_length=256,
-        verbose_name="Подкатегория",
-    )
-    sku = models.CharField(
-        max_length=256,
-        verbose_name="Наименование товара",
-    )
-    uom = models.IntegerField(
-        verbose_name="Единицы измерения",
-        choices=UOMChoices.choices,
-    )
-
-    class Meta:
-        """SKU model metadata."""
-
-        verbose_name = _(
-            "Товар",
-        )
-        verbose_name_plural = _(
-            "Товары",
-        )
-        ordering = ("id",)
-        constraints = [
-            models.UniqueConstraint(
-                fields=(
-                    "group",
-                    "category",
-                    "subcategory",
-                    "sku",
-                    "uom",
-                ),
-                name="unique_SKUs",
-            )
-        ]
-        indexes = [
-            models.Index(
-                fields=(
-                    "group",
-                    "category",
-                    "subcategory",
-                    "sku",
-                    "uom",
-                )
-            ),
-        ]
-
-    def __str__(self):
-        """Return capitalized SKU name."""
-        return self.sku.capitalize()
 
 
 class Sale(models.Model):
