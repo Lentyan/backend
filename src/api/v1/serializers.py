@@ -112,7 +112,25 @@ class ForecastPostSerializer(serializers.Serializer):
     data = serializers.ListSerializer(child=ForecastSerializer())
 
 
-class ForecastFromCSVSerializer(serializers.Serializer):
+class SKUPostSerializer(serializers.Serializer):
+    """Bulk load SKU serializer."""
+
+    data = serializers.ListSerializer(child=SKUSerializer())
+
+
+class StorePostSerializer(serializers.Serializer):
+    """Bulk load store serializer."""
+
+    data = serializers.ListSerializer(child=StoreSerializer())
+
+
+class SalePostSerializer(serializers.Serializer):
+    """Bulk load sale serializer."""
+
+    data = serializers.ListSerializer(child=SaleSerializer())
+
+
+class CSVFileSerializer(serializers.Serializer):
     """Load forecast from csv serializer."""
 
     csv_file = serializers.FileField()
