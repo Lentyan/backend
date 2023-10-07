@@ -24,7 +24,7 @@ class ListOnlyViewSet(mixins.ListModelMixin, GenericViewSet):
 
     pagination_class = None
     list_key = "default_key"
-    model_filed = None
+    model_field = None
 
     class ModelFieldNotSpecifiedError(Exception):
         """Exception raised when field is not specified."""
@@ -44,9 +44,9 @@ class ListOnlyViewSet(mixins.ListModelMixin, GenericViewSet):
 
     def get_queryset(self):
         """Return queryset of unique values."""
-        if self.model_filed is None:
+        if self.model_field is None:
             raise self.ModelFieldNotSpecifiedError("model_field")
-        return self._get_unique_values(self.model_filed)
+        return self._get_unique_values(self.model_field)
 
     def list(self, request, *args, **kwargs):
         """Return list of filtered unique values."""
@@ -63,6 +63,14 @@ class GetOrCreateViewSet(
 ):
     """View set to create or get model instances."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = getattr(self, "model", None)
+        if not self.model:
+            raise AttributeError(
+                "The 'model' attribute must be set on the viewset."
+            )
+
     def paginate_queryset(self, queryset):
         """Turn off pagination is required."""
         if self.request.query_params.get("limit") == "false":
@@ -71,11 +79,28 @@ class GetOrCreateViewSet(
 
     def get_queryset(self):
         """Return model queryset."""
-        if not hasattr(self, "model") or not self.model:
-            raise AttributeError(
-                "The 'model' attribute must be set on the viewset."
-            )
         return self.model.objects.all()
+
+    def get_serializer_class(self):
+        """Return appropriate to method serializer."""
+        raise NotImplementedError("Method must be implemented.")
+
+    def create(self, request, *args, **kwargs):
+        """Bulk create models."""
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            data_entries = serializer.validated_data.get("data", [])
+            model_objects = [self.model(**attrs) for attrs in data_entries]
+            instances = self.model.objects.bulk_create(
+                model_objects,
+                ignore_conflicts=True,
+            )
+            return Response(
+                self.serializer_class(instances, many=True).data,
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         methods=["post"],
@@ -110,6 +135,12 @@ class SKUViewSet(GetOrCreateViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.SKUFilter
 
+    def get_serializer_class(self):
+        """Return appropriate to method serializer."""
+        if self.request.method in SAFE_METHODS:
+            return serializers.SKUSerializer
+        return serializers.SKUPostSerializer
+
 
 class GroupViewSet(ListOnlyViewSet):
     """
@@ -123,7 +154,7 @@ class GroupViewSet(ListOnlyViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.GroupFilter
     list_key = "groups"
-    model_filed = "group"
+    model_field = "group"
 
 
 class CategoryViewSet(ListOnlyViewSet):
@@ -138,7 +169,7 @@ class CategoryViewSet(ListOnlyViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.CategoryFilter
     list_key = "categories"
-    model_filed = "category"
+    model_field = "category"
 
 
 class SubcategoryViewSet(ListOnlyViewSet):
@@ -153,7 +184,7 @@ class SubcategoryViewSet(ListOnlyViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.SubcategoryFiler
     list_key = "subcategories"
-    model_filed = "subcategory"
+    model_field = "subcategory"
 
 
 class StoreViewSet(GetOrCreateViewSet):
@@ -165,6 +196,12 @@ class StoreViewSet(GetOrCreateViewSet):
 
     model = models.Store
     serializer_class = serializers.StoreSerializer
+
+    def get_serializer_class(self):
+        """Return appropriate to method serializer."""
+        if self.request.method in SAFE_METHODS:
+            return serializers.StoreSerializer
+        return serializers.StorePostSerializer
 
 
 class SaleViewSet(GetOrCreateViewSet):
@@ -179,6 +216,12 @@ class SaleViewSet(GetOrCreateViewSet):
     serializer_class = serializers.SaleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.SaleFilter
+
+    def get_serializer_class(self):
+        """Return appropriate to method serializer."""
+        if self.request.method in SAFE_METHODS:
+            return serializers.SaleSerializer
+        return serializers.SalePostSerializer
 
 
 class ForecastViewSet(GetOrCreateViewSet):
