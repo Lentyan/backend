@@ -69,6 +69,34 @@ class GetOrCreateViewSet(
             return None
         return super().paginate_queryset(queryset)
 
+    def get_queryset(self):
+        """Return model queryset."""
+        if not hasattr(self, "model") or not self.model:
+            raise AttributeError(
+                "The 'model' attribute must be set on the viewset."
+            )
+        return self.model.objects.all()
+
+    @action(
+        methods=["post"],
+        detail=False,
+        serializer_class=serializers.CSVFileSerializer,
+    )
+    def create_from_csv(self, request):
+        """
+        Upload forecasts data from a CSV file.
+
+        This action allows users to upload forecasts data from a CSV file.
+        """
+        serializer = serializers.CSVFileSerializer(data=request.data)
+        if serializer.is_valid():
+            csv_reader = read_csv_file(serializer.validated_data["csv_file"])
+            import_data(self.model, csv_reader)
+            return Response(
+                {"message": "CSV is valid"}, status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SKUViewSet(GetOrCreateViewSet):
     """
@@ -77,7 +105,7 @@ class SKUViewSet(GetOrCreateViewSet):
     This view set provides read-only access to the SKU model.
     """
 
-    queryset = models.SKU.objects.all()
+    model = models.SKU
     serializer_class = serializers.SKUSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.SKUFilter
@@ -135,7 +163,7 @@ class StoreViewSet(GetOrCreateViewSet):
     This view set provides read-only access to the Store model.
     """
 
-    queryset = models.Store.objects.all()
+    model = models.Store
     serializer_class = serializers.StoreSerializer
 
 
@@ -147,7 +175,7 @@ class SaleViewSet(GetOrCreateViewSet):
     and supports filtering.
     """
 
-    queryset = models.Sale.objects.all()
+    model = models.Sale
     serializer_class = serializers.SaleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.SaleFilter
@@ -161,7 +189,7 @@ class ForecastViewSet(GetOrCreateViewSet):
     and supports filtering.
     """
 
-    queryset = models.Forecast.objects.all()
+    model = models.Forecast
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.ForecastFilter
 
@@ -186,26 +214,6 @@ class ForecastViewSet(GetOrCreateViewSet):
             return Response(
                 serializers.ForecastSerializer(forecasts, many=True).data,
                 status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(
-        methods=["post"],
-        detail=False,
-        serializer_class=serializers.ForecastFromCSVSerializer,
-    )
-    def create_from_csv(self, request):
-        """
-        Upload forecasts data from a CSV file.
-
-        This action allows users to upload forecasts data from a CSV file.
-        """
-        serializer = serializers.ForecastFromCSVSerializer(data=request.data)
-        if serializer.is_valid():
-            csv_reader = read_csv_file(serializer.validated_data["csv_file"])
-            import_data(models.Forecast, csv_reader)
-            return Response(
-                {"message": "CSV is valid"}, status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
