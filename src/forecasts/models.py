@@ -247,12 +247,14 @@ class Forecast(models.Model):
         on_delete=models.DO_NOTHING,
         verbose_name="Товар",
     )
-
     forecast_date = models.DateTimeField(
         verbose_name="Дата прогноза",
         auto_now_add=True,
     )
-    forecast = models.JSONField(
+    date = models.DateField(
+        verbose_name="Дата",
+    )
+    target = models.IntegerField(
         verbose_name="Прогноз",
     )
 

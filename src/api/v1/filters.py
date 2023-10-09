@@ -50,14 +50,17 @@ class ForecastFilter(django_filters.FilterSet):
         field_name="sku_id",
     )
     forecast_date = django_filters.DateTimeFilter(
-        field_name="forecast_date",
+        field_name="forecast_date__date",
     )
-    forecast_date__gte = django_filters.DateTimeFilter(
-        field_name="forecast_date",
+    date = django_filters.DateTimeFilter(
+        field_name="date",
+    )
+    date__gte = django_filters.DateTimeFilter(
+        field_name="date",
         lookup_expr="gte",
     )
-    forecast_date__lte = django_filters.DateTimeFilter(
-        field_name="forecast_date",
+    date__lte = django_filters.DateTimeFilter(
+        field_name="date",
         lookup_expr="lte",
     )
 
@@ -69,6 +72,7 @@ class ForecastFilter(django_filters.FilterSet):
             "store",
             "sku",
             "forecast_date",
+            "date",
         ]
 
 
@@ -83,10 +87,10 @@ class SaleFilter(django_filters.FilterSet):
     store = MultipleValueFilter(field_class=IntegerField)
     sku = MultipleValueFilter(field_class=IntegerField)
     date = django_filters.DateTimeFilter()
-    date__gte = django_filters.NumberFilter(
+    date__gte = django_filters.DateTimeFilter(
         field_name="date", lookup_expr="gte"
     )
-    date__lte = django_filters.NumberFilter(
+    date__lte = django_filters.DateTimeFilter(
         field_name="date", lookup_expr="lte"
     )
 
