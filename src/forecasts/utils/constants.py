@@ -46,11 +46,12 @@ MODEL_FILE_MAPPING = {
         },
     },
     models.Forecast: {
-        "path": "../data/forecasts.csv",
+        "path": "../data/sales_submission.csv",
         "mapping": {
             "store": {"csv_name": "st_id", "reference": models.Store},
             "sku": {"csv_name": "pr_sku_id", "reference": models.SKU},
-            "forecast": {"csv_name": "forecast"},
+            "date": {"csv_name": "date"},
+            "target": {"csv_name": "target"},
         },
     },
 }
