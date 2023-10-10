@@ -14,6 +14,8 @@ class Command(BaseCommand):
             admin = User.objects.create_superuser(
                 email=os.getenv("DJANGO_SUPERUSER_EMAIL"),
                 password=os.getenv("DJANGO_SUPERUSER_PASSWORD"),
+                first_name=os.getenv("DJANGO_SUPERUSER_FIRST_NAME"),
+                last_name=os.getenv("DJANGO_SUPERUSER_LAST_NAME"),
             )
             admin.is_active = True
             admin.is_superuser = True

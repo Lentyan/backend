@@ -14,6 +14,6 @@ RUN pip install --upgrade pip
 
 RUN pip install -r ./requirements.txt
 
-RUN chmod +x ./infra/backend_entrypoint
+RUN chmod +x ./infra/backend/backend_entrypoint
 
-RUN chmod +x ./infra/celery_worker_entrypoint
+ENTRYPOINT ["./infra/backend/backend_entrypoint"]

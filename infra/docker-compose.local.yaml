@@ -25,8 +25,7 @@ services:
     container_name: django_backend
     build:
       context: ..
-      dockerfile: ./infra/Dockerfile
-    entrypoint: ./infra/backend_entrypoint
+      dockerfile: ./infra/backend/Dockerfile
     volumes:
       - ../src/static:/app/src/static
       - ../src/media:/app/src/media
@@ -42,8 +41,7 @@ services:
     container_name: celery_worker
     build:
       context: ..
-      dockerfile: ./infra/Dockerfile
-    entrypoint: ./infra/celery_worker_entrypoint
+      dockerfile: ./infra/celery/Dockerfile
     volumes:
       - ../src/static:/app/src/static
       - ../src/media:/app/src/media
