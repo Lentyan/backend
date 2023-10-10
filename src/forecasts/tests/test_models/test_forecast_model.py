@@ -32,10 +32,10 @@ class ForecastModelTestCase(TestCase):
         self.forecast = Forecast.objects.create(
             store=self.store,
             sku=self.sku,
-            forecast_date=timezone.localize(
+            date=timezone.localize(
                 datetime.strptime("2023-09-26T12:00:00", "%Y-%m-%dT%H:%M:%S")
             ),
-            forecast={"value": 100},
+            target=100,
         )
 
     def test_str_method(self):
@@ -56,7 +56,7 @@ class ForecastModelTestCase(TestCase):
             forecast_from_db.forecast_date,
             self.forecast.forecast_date,
         )
-        self.assertEqual(forecast_from_db.forecast, {"value": 100})
+        self.assertEqual(forecast_from_db.target, 100)
 
     def test_model_verbose_names(self):
         """Test the verbose names of model fields."""

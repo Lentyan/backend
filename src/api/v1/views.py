@@ -16,6 +16,7 @@ from forecasts import models
 from forecasts.models import AsyncFileResults, Forecast
 from forecasts.tasks import forecast_tasks
 from forecasts.utils.csv_utils import import_data, read_csv_file
+from forecasts.utils.report_utils import get_statistics_data
 from users.models import User
 
 
@@ -242,6 +243,10 @@ class ForecastViewSet(GetOrCreateViewSet):
             return serializers.ForecastSerializer
         return serializers.ForecastPostSerializer
 
+    def get_queryset(self):
+        """Return queryset of unique pairs of SKU and Store."""
+        return self.model.objects.values("sku", "store").distinct()
+
     def create(self, request, *args, **kwargs):
         """Bulk create forecasts."""
         serializer = self.get_serializer(data=request.data)
@@ -267,7 +272,7 @@ class ForecastViewSet(GetOrCreateViewSet):
         permission_classes=(IsAuthenticated,),
         filter_backends=None,
     )
-    def generate_report(self, request, *args, **kwargs):
+    def generate_forecast_report(self, request, *args, **kwargs):
         """Generate forecast report."""
         serializer = serializers.CreateForecastReportSerializer(
             data=request.data,
@@ -276,6 +281,33 @@ class ForecastViewSet(GetOrCreateViewSet):
             task = forecast_tasks.generate_report.delay(
                 request.user.id,
                 serializer.validated_data,
+                "forecast",
+            )
+            return Response(
+                {"task_id": task.task_id}, status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    @action(
+        methods=["post"],
+        detail=False,
+        serializer_class=serializers.CreateStatisticsReportSerializer,
+        permission_classes=(IsAuthenticated,),
+        filter_backends=None,
+    )
+    def generate_statistics_report(self, request, *args, **kwargs):
+        """Generate forecast report."""
+        serializer = serializers.CreateStatisticsReportSerializer(
+            data=request.data,
+        )
+        if serializer.is_valid():
+            task = forecast_tasks.generate_report.delay(
+                request.user.id,
+                serializer.validated_data,
+                "statistics",
             )
             return Response(
                 {"task_id": task.task_id}, status=status.HTTP_201_CREATED
@@ -317,6 +349,21 @@ class ForecastViewSet(GetOrCreateViewSet):
             as_attachment=True,
             status=status.HTTP_200_OK,
         )
+
+    @action(methods=["get"], detail=False)
+    def get_statistics(self, request):
+        """Retrieve statistics based on forecast and sales data."""
+        try:
+            return Response(
+                get_statistics_data(request).to_dict(orient="records"),
+            )
+        except Exception as e:
+            return Response(
+                {"error": {str(e)}},
+                status=getattr(
+                    e, "status_code", status.HTTP_500_INTERNAL_SERVER_ERROR
+                ),
+            )
 
 
 class UserViewSet(viewsets.GenericViewSet):
