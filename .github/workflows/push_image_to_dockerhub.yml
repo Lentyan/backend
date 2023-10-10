@@ -19,10 +19,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_BACKEND_USERNAME }}
           password: ${{ secrets.DOCKER_BACKEND_PASSWORD }}
-      - name: Push to Docker Hub
+      - name: Push backend to Docker Hub
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./infra/Dockerfile
+          file: ./infra/backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_BACKEND_USERNAME }}/lenta_backend:latest
+
+      - name: Push celery to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./infra/celery/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_BACKEND_USERNAME }}/lenta_celery:latest
