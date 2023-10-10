@@ -14,7 +14,7 @@ do
 done
 
 
-until python manage.py init_admin
+until python manage.py init_superuser
 do
     echo "Waiting for user to be created..."
     sleep 10
