@@ -13,6 +13,13 @@ do
     sleep 10
 done
 
+
+until python manage.py init_admin
+do
+    echo "Waiting for user to be created..."
+    sleep 10
+done
+
 # Load initial data (fixtures)
 echo "Load initial data"
 until python manage.py fill_db
