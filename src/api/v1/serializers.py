@@ -105,9 +105,13 @@ class ForecastSerializer(serializers.ModelSerializer):
         queryset=SKU.objects.all(),
     )
 
-    forecast_date = serializers.SerializerMethodField()
+    forecast_date = serializers.SerializerMethodField(read_only=True)
 
-    forecast = serializers.SerializerMethodField()
+    forecast = serializers.SerializerMethodField(read_only=True)
+
+    date = serializers.DateField(write_only=True)
+
+    target = serializers.IntegerField(write_only=True)
 
     class Meta:
         """Forecast model serializer meta."""
@@ -118,6 +122,8 @@ class ForecastSerializer(serializers.ModelSerializer):
             "sku",
             "forecast_date",
             "forecast",
+            "date",
+            "target",
         )
 
     def get_forecast(self, forecast):
