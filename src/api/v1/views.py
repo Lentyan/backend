@@ -255,12 +255,12 @@ class ForecastViewSet(GetOrCreateViewSet):
                 Forecast(**attrs)
                 for attrs in serializer.validated_data.get("data")
             ]
-            forecasts = Forecast.objects.bulk_create(
+            Forecast.objects.bulk_create(
                 forecasts_objects,
                 ignore_conflicts=True,
             )
             return Response(
-                serializers.ForecastSerializer(forecasts, many=True).data,
+                {"message": "created"},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
